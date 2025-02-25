@@ -1,6 +1,6 @@
-.env
+# .env
 
-alembic.ini
-alembic/env.py
-alembic/versions
+# alembic.ini
+# alembic/env.py
+# alembic/versions
 
