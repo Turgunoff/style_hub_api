@@ -1,59 +1,62 @@
-# StyleHub
+# Sartaroshxona API
 
-## Description
+## Loyiha haqida
 
-StyleHub is a web application that allows users to upload and share their style.
+Sartaroshxona API - bu mijozlar uchun sartaroshxona xizmatlarini bron qilish imkonini beruvchi dastur. Foydalanuvchilar xizmatlarni ko'rish, sartaroshlarni tanlash va uchrashuv vaqtini belgilash imkoniyatiga ega.
 
-## Setup
+## O'rnatish
 
-### Prerequisites
+### Talab qilinadigan dasturlar
 
 - Python 3.8+
-- PostgreSQL database
+- PostgreSQL ma'lumotlar bazasi
 
-### Installation
+### O'rnatish bosqichlari
 
-1. Clone the repository
+1. Repozitoriyani klonlash
 
    ```bash
-   git clone https://github.com/Turgunoff/style_hub_api.git
-   cd style_hub_api
+   git clone https://github.com/Turgunoff/sartaroshxona_api.git
+   cd sartaroshxona_api
    ```
 
-2. Create and activate a virtual environment
+2. Virtual muhitni yaratish va faollashtirish
 
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # Windows uchun: venv\Scripts\activate
    ```
 
-3. Install dependencies
+3. Kerakli kutubxonalarni o'rnatish
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Create environment file
+4. Muhit faylini yaratish
 
    ```bash
    cp .env.example .env
    ```
 
-   Then edit the `.env` file with your database credentials and other configuration.
+   Keyin `.env` faylini o'zingizning ma'lumotlar bazasi ma'lumotlari va boshqa sozlamalar bilan to'ldiring.
 
-5. Set up the database
+5. Ma'lumotlar bazasini sozlash
 
    ```bash
    alembic upgrade head
    ```
 
-6. Run the application
+6. Dasturni ishga tushirish
    ```bash
    uvicorn app.main:app --reload
    ```
 
-## Environment Variables
+## Muhit o'zgaruvchilari
 
-Create a `.env` file in the root directory with the following variables:
+Asosiy katalogda quyidagi o'zgaruvchilar bilan `.env` faylini yarating:
 
-DATABASE_URL=postgresql://username:password@localhost:5432/styleh
+DATABASE_URL=postgresql://username:password@localhost:5432/sartaroshxona
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
