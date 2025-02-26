@@ -3,11 +3,10 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# Loyiha ildiz papkasini `sys.path` ga qo‘shish
+# Loyiha ildiz papkasini `sys.path` ga qo'shish
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-
-from models.models import Base 
+from app.models.models import Base  # Import yo'lini yangilash
 
 # config.py o'rniga to'g'ridan-to'g'ri .env dan o'qiymiz
 load_dotenv()
@@ -18,4 +17,4 @@ connectable = create_async_engine(
     pool_pre_ping=True
 )
 
-target_metadata = Base.metadata  # Alembic uchun metadata o‘rnatamiz
+target_metadata = Base.metadata  # Alembic uchun metadata o'rnatamiz

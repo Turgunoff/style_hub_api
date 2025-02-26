@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import enum
 from datetime import datetime
-from database import Base  # Import Base from database.py
+from app.db.database import Base  # Import Base from app.db.database
 
 # Buyurtma statusi uchun ENUM
 class AppointmentStatus(str, enum.Enum):
