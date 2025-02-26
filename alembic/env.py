@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-from models.models import Base  # models.py dan bazaviy classni import qilamiz
+from models.models import Base 
 
 # config.py o'rniga to'g'ridan-to'g'ri .env dan o'qiymiz
 load_dotenv()
