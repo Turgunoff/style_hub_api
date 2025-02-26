@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List, Optional
 from pydantic import BaseModel
+from datetime import datetime
 
 from app.models.models import Category, User
 from app.db.database import get_db
@@ -19,12 +20,13 @@ class CategoryCreate(BaseModel):
 # Kategoriya ma'lumotlarini qaytarish uchun schema
 class CategoryResponse(BaseModel):
     id: int
+    created_at: datetime
     name: str
     description: Optional[str] = None
     image_url: Optional[str] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Yangi kategoriya yaratish (faqat admin uchun)
 @router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)

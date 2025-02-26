@@ -25,7 +25,7 @@ class AppointmentResponse(BaseModel):
     status: AppointmentStatus
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Yangi buyurtma yaratish
 @router.post("/", response_model=AppointmentResponse, status_code=status.HTTP_201_CREATED)

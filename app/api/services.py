@@ -28,7 +28,7 @@ class ServiceResponse(BaseModel):
     duration: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Yangi xizmat yaratish (faqat admin uchun)
 @router.post("/", response_model=ServiceResponse, status_code=status.HTTP_201_CREATED)

@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List, Optional
 from pydantic import BaseModel
+from datetime import datetime
 
 from app.models.models import User
 from app.db.database import get_db
@@ -12,20 +13,25 @@ router = APIRouter()
 
 # Foydalanuvchi yaratish uchun schema
 class UserCreate(BaseModel):
-    full_name: str
+    name: Optional[str] = None
     phone: str
-    email: Optional[str] = None
     password: str
+    role: Optional[str] = None
+    email: Optional[str] = None
+    full_name: str
 
 # Foydalanuvchi ma'lumotlarini qaytarish uchun schema
 class UserResponse(BaseModel):
     id: int
-    full_name: str
+    name: Optional[str] = None
+    created_at: datetime
     phone: str
+    role: Optional[str] = None
     email: Optional[str] = None
+    full_name: str
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Yangi foydalanuvchi yaratish
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -44,9 +50,11 @@ async def create_user(user_data: UserCreate, db: AsyncSession = Depends(get_db))
     # Yangi foydalanuvchi yaratish
     # Haqiqiy loyihada parol hash qilinadi
     new_user = User(
+        name=user_data.name,
         full_name=user_data.full_name,
         phone=user_data.phone,
         email=user_data.email,
+        role=user_data.role,
         password_hash=user_data.password  # Haqiqiy loyihada: get_password_hash(user_data.password)
     )
     

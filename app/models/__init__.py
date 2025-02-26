@@ -8,6 +8,8 @@ from app.models.models import (
     Category,
     Service,
     Appointment,
-    AppointmentStatus
+    AppointmentStatus,
+    Barber,
+    Banner
 )
 
