@@ -2,7 +2,11 @@
 
 ## Loyiha haqida
 
-Sartaroshxona API - bu mijozlar uchun sartaroshxona xizmatlarini bron qilish imkonini beruvchi dastur. Foydalanuvchilar xizmatlarni ko'rish, sartaroshlarni tanlash va uchrashuv vaqtini belgilash imkoniyatiga ega.
+Sartaroshxona API - sartaroshxona xizmatlarini bron qilish uchun dastur. Foydalanuvchilar:
+
+- Xizmatlarni ko'rish
+- Sartaroshlarni tanlash
+- Uchrashuv vaqtini belgilash imkoniyatlariga ega
 
 ## O'rnatish
 
