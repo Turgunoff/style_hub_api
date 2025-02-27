@@ -1,6 +1,47 @@
-# .env
+# Muhit fayllari
+.env
+.env.*
+!.env.example
 
-# alembic.ini
-# alembic/env.py
-# alembic/versions
+# Alembic migratsiya fayllari
+alembic.ini
+alembic/env.py
+alembic/versions/
+
+# Python kesh fayllari
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual muhit
+venv/
+ENV/
+
+# IDE fayllari
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Boshqa maxfiy fayllar
+*.log
+*.sqlite
+*.db
 
