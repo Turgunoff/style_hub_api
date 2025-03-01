@@ -31,6 +31,8 @@ async def get_banners(
 ):
     today = datetime.now()
 
+    # Banner modelida faqat id, start_date, end_date, is_active, image_url ustunlari bor
+    # To'liq Banner obyektini tanlaymiz
     query = select(Banner)
 
     if active_only:
@@ -43,7 +45,7 @@ async def get_banners(
     query = query.offset(skip).limit(limit)
 
     result = await db.execute(query)
-    banners = result.scalars().all()  # `.all()` emas, `scalars().all()`
+    banners = result.scalars().all()  # scalars() orqali Banner obyektlarini olamiz
 
     return banners
 
@@ -53,10 +55,11 @@ async def get_banner(
     banner_id: int, 
     db: AsyncSession = Depends(get_db)
 ):
+    # Banner modelida faqat id, start_date, end_date, is_active, image_url ustunlari bor
     query = select(Banner).where(Banner.id == banner_id)
     
     result = await db.execute(query)
-    banner = result.scalars().first()  # `.first()` emas, `scalars().first()`
+    banner = result.scalars().first()  # scalars() orqali Banner obyektini olamiz
 
     if not banner:
         raise HTTPException(
