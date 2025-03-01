@@ -27,8 +27,8 @@ class CategoryResponse(BaseModel):
 async def get_categories(
     db: AsyncSession = Depends(get_db),
     name: Optional[str] = None,  # Filtrlash uchun
-    sort_by: Optional[str] = "barber_count",  # Saralash ustuni
-    order: Optional[str] = "desc",  # Saralash tartibi ('asc' yoki 'desc')
+    sort_by: Optional[str] = "id",  # Default holatda ID bo‘yicha saralanadi
+    order: Optional[str] = "asc",  # Default tartib (oshish tartibida)
 ):
     query = (
         select(
@@ -40,7 +40,7 @@ async def get_categories(
             func.count(Barber.id).label("barber_count"),
         )
         .outerjoin(Barber, Category.id == Barber.category_id)
-        .group_by(Category.id, Category.created_at, Category.description, Category.image_url)
+        .group_by(Category.id, Category.created_at, Category.name, Category.description, Category.image_url)
     )
 
     # **Nomi bo‘yicha filtr**
@@ -49,10 +49,11 @@ async def get_categories(
 
     # **Saralash (Dynamic Order by)**
     sort_column = {
+        "id": Category.id,
         "name": Category.name,
         "barber_count": func.count(Barber.id),
         "created_at": Category.created_at,
-    }.get(sort_by, func.count(Barber.id))  # Default: barber_count
+    }.get(sort_by, Category.id)  # Default: ID bo‘yicha tartiblash
 
     if order == "asc":
         query = query.order_by(sort_column.asc())
