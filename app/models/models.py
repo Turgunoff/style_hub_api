@@ -93,10 +93,7 @@ class Banner(Base):
     __tablename__ = "banners"
 
     id = Column(Integer, primary_key=True, index=True)
-    start_date = Column(DateTime, nullable=True)
-    end_date = Column(DateTime, nullable=True)
+    start_date = Column(DateTime(timezone=True), nullable=True)
+    end_date = Column(DateTime(timezone=True), nullable=True)
     is_active = Column(Boolean, default=True)
-    link_url = Column(String, nullable=True)
-    title = Column(String, nullable=False)
     image_url = Column(String, nullable=True)
-    description = Column(String, nullable=True)
