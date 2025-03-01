@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import func  
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -23,9 +23,13 @@ class CategoryResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# 📌 Barcha kategoriyalarni olish (limit va skip yo'q)
 @router.get("/", response_model=List[CategoryResponse])
-async def get_categories(db: AsyncSession = Depends(get_db)):
+async def get_categories(
+    db: AsyncSession = Depends(get_db),
+    name: Optional[str] = None,  # Filtrlash uchun
+    sort_by: Optional[str] = "barber_count",  # Saralash ustuni
+    order: Optional[str] = "desc",  # Saralash tartibi ('asc' yoki 'desc')
+):
     query = (
         select(
             Category.id,
@@ -33,12 +37,27 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
             Category.name,
             Category.description,
             Category.image_url,
-            func.count(Barber.id).label("barber_count")
+            func.count(Barber.id).label("barber_count"),
         )
         .outerjoin(Barber, Category.id == Barber.category_id)
         .group_by(Category.id, Category.created_at, Category.description, Category.image_url)
-        .order_by(func.count(Barber.id).desc())  # 📌 Barberlar soni bo‘yicha kamayish tartibida saralash
     )
+
+    # **Nomi bo‘yicha filtr**
+    if name:
+        query = query.where(Category.name.ilike(f"%{name}%"))
+
+    # **Saralash (Dynamic Order by)**
+    sort_column = {
+        "name": Category.name,
+        "barber_count": func.count(Barber.id),
+        "created_at": Category.created_at,
+    }.get(sort_by, func.count(Barber.id))  # Default: barber_count
+
+    if order == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
 
     result = await db.execute(query)
     categories = result.all()
@@ -50,7 +69,7 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
             "name": row.name,
             "description": row.description,
             "image_url": row.image_url,
-            "barber_count": row.barber_count
+            "barber_count": row.barber_count,
         }
         for row in categories
     ]
