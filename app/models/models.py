@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Enum, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Enum, Boolean, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -12,15 +12,14 @@ class AppointmentStatus(str, enum.Enum):
     cancelled = "cancelled"
     completed = "completed"
 
-# 1. Foydalanuvchilar jadvali (Users)
+# 1. Foydalanuvchilar jadvali (Clients)
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "clients"
 
-    name = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
     id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
     phone = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    password_hash = Column(Text, nullable=False)
     role = Column(String, nullable=True)
     email = Column(String, unique=True, nullable=True)
     full_name = Column(String, nullable=False)
@@ -59,7 +58,7 @@ class Appointment(Base):
     __tablename__ = "appointments"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
     service_id = Column(Integer, ForeignKey("services.id"), nullable=False)
     barber_id = Column(Integer, ForeignKey("barbers.id"), nullable=True)  # Barber ID qo'shamiz
     appointment_time = Column(DateTime, nullable=False)
