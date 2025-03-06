@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from app.models.models import Service, Category, User
 from app.db.database import get_db
-from app.api.auth import get_current_user
+from app.api.auth import get_current_client
 
 router = APIRouter()
 
@@ -35,7 +35,7 @@ class ServiceResponse(BaseModel):
 async def create_service(
     service_data: ServiceCreate, 
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     
@@ -70,14 +70,9 @@ async def create_service(
 async def get_services(
     skip: int = 0, 
     limit: int = 100, 
-    category_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
-    if category_id:
-        query = select(Service).where(Service.category_id == category_id).offset(skip).limit(limit)
-    else:
-        query = select(Service).offset(skip).limit(limit)
-    
+    query = select(Service).offset(skip).limit(limit)
     result = await db.execute(query)
     services = result.scalars().all()
     
@@ -107,7 +102,7 @@ async def update_service(
     service_id: int,
     service_data: ServiceCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     
@@ -150,7 +145,7 @@ async def update_service(
 async def delete_service(
     service_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     

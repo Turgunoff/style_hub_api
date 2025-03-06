@@ -7,7 +7,7 @@ from datetime import date, datetime
 
 from app.models.models import Banner, User
 from app.db.database import get_db
-from app.api.auth import get_current_user
+from app.api.auth import get_current_client
 
 router = APIRouter()
 

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from app.models.models import Barber, User
 from app.db.database import get_db
-from app.api.auth import get_current_user
+from app.api.auth import get_current_client
 
 router = APIRouter()
 
@@ -41,7 +41,7 @@ class BarberResponse(BaseModel):
 async def create_barber(
     barber_data: BarberCreate, 
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     
@@ -112,7 +112,7 @@ async def update_barber(
     barber_id: int,
     barber_data: BarberCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     
@@ -146,7 +146,7 @@ async def update_barber(
 async def delete_barber(
     barber_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Admin tekshiruvi
     

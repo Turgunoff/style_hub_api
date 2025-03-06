@@ -7,7 +7,7 @@ from datetime import datetime
 
 from app.models.models import User, Category, Service, Appointment, AppointmentStatus
 from app.db.database import get_db
-from app.api.auth import get_current_user
+from app.api.auth import get_current_client
 
 router = APIRouter()
 
@@ -22,7 +22,8 @@ class AppointmentResponse(BaseModel):
     user_id: int
     service_id: int
     appointment_time: datetime
-    status: AppointmentStatus
+    status: str
+    created_at: datetime
     
     class Config:
         from_attributes = True
@@ -32,7 +33,7 @@ class AppointmentResponse(BaseModel):
 async def create_appointment(
     appointment_data: AppointmentCreate, 
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     # Xizmat mavjudligini tekshirish
     query = select(Service).where(Service.id == appointment_data.service_id)
@@ -50,7 +51,7 @@ async def create_appointment(
     
     # Yangi buyurtma yaratish
     new_appointment = Appointment(
-        user_id=current_user.id,
+        user_id=current_client.id,
         service_id=appointment_data.service_id,
         appointment_time=appointment_data.appointment_time,
         status=AppointmentStatus.pending
@@ -69,16 +70,16 @@ async def get_my_appointments(
     limit: int = 100, 
     status: Optional[AppointmentStatus] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     if status:
         query = select(Appointment).where(
-            Appointment.user_id == current_user.id,
+            Appointment.user_id == current_client.id,
             Appointment.status == status
         ).offset(skip).limit(limit)
     else:
         query = select(Appointment).where(
-            Appointment.user_id == current_user.id
+            Appointment.user_id == current_client.id
         ).offset(skip).limit(limit)
     
     result = await db.execute(query)
@@ -88,22 +89,15 @@ async def get_my_appointments(
 
 # Barcha buyurtmalarni olish (faqat admin uchun)
 @router.get("/", response_model=List[AppointmentResponse])
-async def get_all_appointments(
+async def get_appointments(
     skip: int = 0, 
     limit: int = 100, 
-    status: Optional[AppointmentStatus] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
-    # Admin tekshiruvi
+    # Bu yerda admin tekshiruvi bo'lishi kerak
     
-    if status:
-        query = select(Appointment).where(
-            Appointment.status == status
-        ).offset(skip).limit(limit)
-    else:
-        query = select(Appointment).offset(skip).limit(limit)
-    
+    query = select(Appointment).offset(skip).limit(limit)
     result = await db.execute(query)
     appointments = result.scalars().all()
     
@@ -114,7 +108,7 @@ async def get_all_appointments(
 async def get_appointment(
     appointment_id: int, 
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     query = select(Appointment).where(Appointment.id == appointment_id)
     result = await db.execute(query)
@@ -127,7 +121,7 @@ async def get_appointment(
         )
     
     # Faqat o'z buyurtmasini yoki admin ko'ra oladi
-    if appointment.user_id != current_user.id:
+    if appointment.user_id != current_client.id:
         # Admin tekshiruvi
         pass
     
@@ -139,7 +133,7 @@ async def update_appointment_status(
     appointment_id: int,
     status: AppointmentStatus,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     query = select(Appointment).where(Appointment.id == appointment_id)
     result = await db.execute(query)
@@ -152,7 +146,7 @@ async def update_appointment_status(
         )
     
     # Faqat o'z buyurtmasini yoki admin o'zgartira oladi
-    if appointment.user_id != current_user.id:
+    if appointment.user_id != current_client.id:
         # Admin tekshiruvi
         pass
     
@@ -169,7 +163,7 @@ async def update_appointment_status(
 async def cancel_appointment(
     appointment_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_client: User = Depends(get_current_client)
 ):
     query = select(Appointment).where(Appointment.id == appointment_id)
     result = await db.execute(query)
@@ -182,7 +176,7 @@ async def cancel_appointment(
         )
     
     # Faqat o'z buyurtmasini yoki admin o'zgartira oladi
-    if appointment.user_id != current_user.id:
+    if appointment.user_id != current_client.id:
         # Admin tekshiruvi
         pass
     
