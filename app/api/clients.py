@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 from app.models.models import User
@@ -14,47 +14,46 @@ router = APIRouter()
 
 # Mijoz yaratish uchun schema
 class ClientCreate(BaseModel):
-    phone: str
-    password: str
-    role: Optional[str] = None
-    email: Optional[str] = None
-    full_name: str
+    email: EmailStr  # Email majburiy
+    password: str  # Password majburiy
+    role: Optional[str] = None  # Role ixtiyoriy
+    phone: Optional[str] = None  # Phone ixtiyoriy
+    full_name: str  # Full name majburiy
 
 # Mijoz ma'lumotlarini qaytarish uchun schema
 class ClientResponse(BaseModel):
     id: int
     created_at: datetime
-    phone: str
+    email: str
     role: Optional[str] = None
-    email: Optional[str] = None
+    phone: Optional[str] = None
     full_name: str
     
     class Config:
         from_attributes = True
 
-# Yangi mijoz yaratish
 @router.post("/", response_model=ClientResponse, status_code=status.HTTP_201_CREATED)
 async def create_client(client_data: ClientCreate, db: AsyncSession = Depends(get_db)):
     try:
-        # Telefon raqami mavjudligini tekshirish
-        query = select(User).where(User.phone == client_data.phone)
+        # Email mavjudligini tekshirish
+        query = select(User).where(User.email == client_data.email)
         result = await db.execute(query)
         existing_client = result.scalars().first()
         
         if existing_client:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Bu telefon raqami bilan ro'yxatdan o'tilgan"
+                detail="Bu email bilan ro'yxatdan o'tilgan"
             )
         
         # Yangi mijoz yaratish
         hashed_password = get_password_hash(client_data.password)
         new_client = User(
-            phone=client_data.phone,
-            password_hash=hashed_password,
-            role=client_data.role,
             email=client_data.email,
-            full_name=client_data.full_name
+            password_hash=hashed_password,
+            role=client_data.role,  # role ixtiyoriy
+            phone=client_data.phone,  # phone ixtiyoriy
+            full_name=client_data.full_name  # full_name majburiy
         )
         
         db.add(new_client)
@@ -68,6 +67,7 @@ async def create_client(client_data: ClientCreate, db: AsyncSession = Depends(ge
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+
 
 # Barcha mijozlarni olish (faqat admin uchun)
 @router.get("/", response_model=List[ClientResponse])

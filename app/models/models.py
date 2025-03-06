@@ -18,12 +18,12 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    phone = Column(String, unique=True, nullable=False)
+    phone = Column(String, unique=True, nullable=True)  # phone maydoni ixtiyoriy
     password_hash = Column(Text, nullable=False)
-    role = Column(String, nullable=True)
-    email = Column(String, unique=True, nullable=True)
-    full_name = Column(String, nullable=False)
-
+    role = Column(String, nullable=True)  # role ixtiyoriy
+    email = Column(String, unique=True, nullable=False)  # email majburiy
+    full_name = Column(String, nullable=False)  # full_name majburiy
+    
     appointments = relationship("Appointment", back_populates="user")
 
 # 2. Xizmat kategoriyalari jadvali (Categories)

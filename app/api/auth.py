@@ -74,15 +74,15 @@ async def login_for_access_token(
     db: AsyncSession = Depends(get_db)
 ):
     """Login qilish va tokenlar olish"""
-    # Mijozni telefon raqami orqali qidirish
-    query = select(User).where(User.phone == form_data.username)
+    # Mijozni email orqali qidirish
+    query = select(User).where(User.email == form_data.username)
     result = await db.execute(query)
     client = result.scalars().first()
 
     if not client:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Telefon raqami yoki parol noto'g'ri",
+            detail="Email yoki parol noto'g'ri",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -90,7 +90,7 @@ async def login_for_access_token(
     if not verify_password(form_data.password, client.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Telefon raqami yoki parol noto'g'ri",
+            detail="Email yoki parol noto'g'ri",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -114,7 +114,7 @@ async def login_for_access_token(
         "client": {
             "id": client.id,
             "full_name": client.full_name,
-            "phone": client.phone
+            "email": client.email
         }
     }
 
@@ -166,7 +166,7 @@ async def read_clients_me(current_client: User = Depends(get_current_client)):
         "client": {
             "id": current_client.id,
             "full_name": current_client.full_name,
-            "phone": current_client.phone
+            "email": current_client.email
         }
     }
 
