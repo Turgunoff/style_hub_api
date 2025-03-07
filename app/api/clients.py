@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 
 from app.models.models import User
@@ -14,19 +14,21 @@ router = APIRouter()
 
 # Mijoz yaratish uchun schema
 class ClientCreate(BaseModel):
-    email: EmailStr  # Email majburiy
-    password: str  # Password majburiy
-    role: Optional[str] = None  # Role ixtiyoriy
-    phone: Optional[str] = None  # Phone ixtiyoriy
-    full_name: str  # Full name majburiy
+    email: EmailStr
+    password: str
+    full_name: str
+    
+    @validator('password')
+    def password_strength(cls, v):
+        if len(v) < 6:
+            raise ValueError('Parol kamida 6 ta belgidan iborat bo\'lishi kerak')
+        return v
 
 # Mijoz ma'lumotlarini qaytarish uchun schema
 class ClientResponse(BaseModel):
     id: int
     created_at: datetime
     email: str
-    role: Optional[str] = None
-    phone: Optional[str] = None
     full_name: str
     
     class Config:
@@ -51,9 +53,7 @@ async def create_client(client_data: ClientCreate, db: AsyncSession = Depends(ge
         new_client = User(
             email=client_data.email,
             password_hash=hashed_password,
-            role=client_data.role,  # role ixtiyoriy
-            phone=client_data.phone,  # phone ixtiyoriy
-            full_name=client_data.full_name  # full_name majburiy
+            full_name=client_data.full_name
         )
         
         db.add(new_client)
@@ -61,6 +61,11 @@ async def create_client(client_data: ClientCreate, db: AsyncSession = Depends(ge
         await db.refresh(new_client)
         
         return new_client
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
     except Exception as e:
         await db.rollback()
         raise HTTPException(
